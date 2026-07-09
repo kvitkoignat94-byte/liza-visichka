@@ -5,37 +5,122 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Лиза | Визитка</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --bg: #0a0a0f;
-            --surface: #12121a;
-            --surface-2: #1a1a25;
+            --bg: #08080c;
+            --surface: #101018;
             --accent: #e8735a;
-            --accent-soft: rgba(232, 115, 90, 0.15);
+            --accent-2: #c45dff;
             --text: #f0ece6;
-            --text-muted: #8a8690;
-            --border: rgba(255, 255, 255, 0.06);
+            --text-muted: #6a6670;
+            --border: rgba(255,255,255,0.06);
         }
 
-        html {
-            scroll-behavior: smooth;
-        }
+        html { scroll-behavior: smooth; }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
+            font-family: 'Inter', sans-serif;
             background: var(--bg);
             color: var(--text);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            cursor: none;
         }
 
+        /* === CUSTOM CURSOR === */
+        .cursor {
+            position: fixed;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.15s ease, opacity 0.3s;
+            mix-blend-mode: difference;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-dot {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-follower {
+            position: fixed;
+            width: 50px;
+            height: 50px;
+            border: 1px solid rgba(232,115,90,0.3);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9998;
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1), width 0.3s, height 0.3s, border-color 0.3s;
+            transform: translate(-50%, -50%);
+        }
+
+        .cursor-follower.hover {
+            width: 80px;
+            height: 80px;
+            border-color: var(--accent-2);
+        }
+
+        /* === LOADING SCREEN === */
+        .loader {
+            position: fixed;
+            inset: 0;
+            background: var(--bg);
+            z-index: 10000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            transition: opacity 0.6s, visibility 0.6s;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-text {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(3rem, 10vw, 6rem);
+            font-weight: 700;
+            overflow: hidden;
+        }
+
+        .loader-text span {
+            display: inline-block;
+            transform: translateY(120%);
+            animation: loaderReveal 0.6s cubic-bezier(0.16,1,0.3,1) forwards;
+        }
+
+        @keyframes loaderReveal {
+            to { transform: translateY(0); }
+        }
+
+        .loader-line {
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            margin-top: 20px;
+            animation: loaderLine 1.5s cubic-bezier(0.7,0,0.3,1) forwards;
+        }
+
+        @keyframes loaderLine {
+            to { width: 200px; }
+        }
+
+        /* === HERO === */
         .hero {
             min-height: 100vh;
             display: flex;
@@ -44,57 +129,149 @@
             justify-content: center;
             position: relative;
             padding: 40px 20px;
-            background: radial-gradient(ellipse at 50% 0%, rgba(232, 115, 90, 0.08) 0%, transparent 60%);
+            overflow: hidden;
         }
 
-        .photo-wrap {
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 30% 20%, rgba(232,115,90,0.08) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(196,93,255,0.06) 0%, transparent 50%);
+        }
+
+        /* === NOISE OVERLAY === */
+        .noise {
+            position: fixed;
+            inset: 0;
+            z-index: 9997;
+            pointer-events: none;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+            background-repeat: repeat;
+            background-size: 256px;
+        }
+
+        /* === PHOTO === */
+        .photo-container {
             position: relative;
-            margin-bottom: 32px;
+            margin-bottom: 40px;
         }
 
-        .photo-wrap::before {
+        .photo-container::before {
             content: '';
             position: absolute;
-            inset: -20px;
+            inset: -30px;
             border-radius: 50%;
-            background: conic-gradient(from 45deg, transparent, var(--accent), transparent);
-            opacity: 0.3;
-            filter: blur(20px);
-            animation: glow 4s ease-in-out infinite alternate;
+            background: conic-gradient(from 0deg, var(--accent), var(--accent-2), var(--accent));
+            opacity: 0;
+            filter: blur(30px);
+            animation: photoGlow 3s ease-in-out infinite alternate;
         }
 
-        @keyframes glow {
-            from { opacity: 0.2; transform: scale(1); }
-            to { opacity: 0.4; transform: scale(1.1); }
+        @keyframes photoGlow {
+            from { opacity: 0.2; transform: rotate(0deg) scale(1); }
+            to { opacity: 0.4; transform: rotate(180deg) scale(1.15); }
         }
 
         .photo {
-            width: 200px;
-            height: 200px;
+            width: 220px;
+            height: 220px;
             border-radius: 50%;
             object-fit: cover;
             position: relative;
             z-index: 1;
             border: 2px solid var(--border);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            filter: grayscale(20%);
+            transition: filter 0.6s, transform 0.6s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        .photo-container:hover .photo {
+            filter: grayscale(0%);
+            transform: scale(1.05);
+        }
+
+        .photo-ring {
+            position: absolute;
+            inset: -8px;
+            border-radius: 50%;
+            border: 1px solid rgba(232,115,90,0.3);
+            animation: ringPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes ringPulse {
+            0%, 100% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.08); opacity: 0; }
+        }
+
+        /* === GLITCH NAME === */
+        .name-wrapper {
+            position: relative;
+            margin-bottom: 16px;
         }
 
         .name {
             font-family: 'Playfair Display', serif;
-            font-size: clamp(3rem, 10vw, 5rem);
+            font-size: clamp(3.5rem, 12vw, 7rem);
             font-weight: 700;
-            letter-spacing: -2px;
+            letter-spacing: -3px;
             text-align: center;
             line-height: 1;
-            margin-bottom: 12px;
+            position: relative;
         }
 
+        .name-glitch {
+            position: relative;
+            display: inline-block;
+        }
+
+        .name-glitch::before,
+        .name-glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+        }
+
+        .name-glitch::before {
+            color: var(--accent);
+            z-index: -1;
+            animation: glitch1 4s infinite linear;
+        }
+
+        .name-glitch::after {
+            color: var(--accent-2);
+            z-index: -2;
+            animation: glitch2 4s infinite linear;
+        }
+
+        @keyframes glitch1 {
+            0%, 92%, 100% { opacity: 0; transform: translate(0); }
+            93% { opacity: 0.8; transform: translate(3px, -2px); clip-path: inset(20% 0 60% 0); }
+            95% { opacity: 0; }
+            96% { opacity: 0.6; transform: translate(-2px, 1px); clip-path: inset(50% 0 20% 0); }
+            97% { opacity: 0; }
+        }
+
+        @keyframes glitch2 {
+            0%, 90%, 100% { opacity: 0; transform: translate(0); }
+            91% { opacity: 0.7; transform: translate(-3px, 2px); clip-path: inset(40% 0 30% 0); }
+            93% { opacity: 0; }
+            94% { opacity: 0.5; transform: translate(2px, -1px); clip-path: inset(10% 0 70% 0); }
+            95% { opacity: 0; }
+        }
+
+        /* === TEXT SCRAMBLE === */
         .tagline {
             font-size: 0.85rem;
             font-weight: 300;
             color: var(--text-muted);
-            letter-spacing: 4px;
+            letter-spacing: 6px;
             text-transform: uppercase;
+            text-align: center;
         }
 
         .scroll-indicator {
@@ -102,17 +279,33 @@
             bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .scroll-indicator span {
+            font-size: 0.6rem;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .scroll-line {
             width: 1px;
-            height: 60px;
+            height: 50px;
             background: linear-gradient(to bottom, var(--accent), transparent);
-            animation: scrollPulse 2s ease-in-out infinite;
+            animation: scrollAnim 2s ease-in-out infinite;
         }
 
-        @keyframes scrollPulse {
-            0%, 100% { opacity: 0.3; height: 60px; }
-            50% { opacity: 0.8; height: 80px; }
+        @keyframes scrollAnim {
+            0%, 100% { opacity: 0.3; transform: scaleY(1); }
+            50% { opacity: 1; transform: scaleY(1.3); transform-origin: top; }
         }
 
+        /* === CONTENT === */
         .content {
             max-width: 680px;
             margin: 0 auto;
@@ -120,52 +313,99 @@
         }
 
         .section-label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 600;
-            letter-spacing: 3px;
+            letter-spacing: 4px;
             text-transform: uppercase;
             color: var(--accent);
             margin-bottom: 40px;
+            overflow: hidden;
         }
 
+        .section-label span {
+            display: inline-block;
+            transform: translateY(120%);
+            transition: transform 0.8s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        .section-label.visible span {
+            transform: translateY(0);
+        }
+
+        /* === ABOUT GRID === */
         .about-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 1px;
             background: var(--border);
-            border-radius: 16px;
+            border-radius: 20px;
             overflow: hidden;
             margin-bottom: 60px;
         }
 
         .about-item {
             background: var(--surface);
-            padding: 28px 24px;
+            padding: 30px 24px;
+            position: relative;
+            overflow: hidden;
+            transition: background 0.4s;
+        }
+
+        .about-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(232,115,90,0.08) 0%, transparent 60%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .about-item:hover::after {
+            opacity: 1;
         }
 
         .about-item .label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             font-weight: 500;
             letter-spacing: 2px;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
         }
 
         .about-item .value {
-            font-size: 1.05rem;
+            font-size: 1.1rem;
             font-weight: 500;
             color: var(--text);
+            position: relative;
+            z-index: 1;
         }
 
+        /* === MAGNETIC HOVER === */
+        .magnetic {
+            transition: transform 0.4s cubic-bezier(0.16,1,0.3,1);
+        }
+
+        /* === DIVIDER === */
         .divider {
             width: 40px;
             height: 1px;
-            background: var(--accent);
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
             margin: 60px 0;
-            opacity: 0.5;
+            opacity: 0;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: all 0.8s cubic-bezier(0.16,1,0.3,1);
         }
 
+        .divider.visible {
+            opacity: 0.6;
+            transform: scaleX(1);
+        }
+
+        /* === QUOTE === */
         .quote-block {
             position: relative;
             padding: 40px 0;
@@ -176,30 +416,31 @@
             font-family: 'Playfair Display', serif;
             font-size: 8rem;
             color: var(--accent);
-            opacity: 0.15;
+            opacity: 0.12;
             position: absolute;
-            top: -20px;
-            left: -10px;
+            top: -30px;
+            left: -15px;
             line-height: 1;
         }
 
-        .quote-block .quote-text {
+        .quote-text {
             font-family: 'Playfair Display', serif;
             font-size: clamp(1.3rem, 4vw, 1.8rem);
             font-style: italic;
-            line-height: 1.6;
+            line-height: 1.7;
             color: var(--text);
             position: relative;
             z-index: 1;
         }
 
-        .quote-block .quote-author {
+        .quote-author {
             margin-top: 24px;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             letter-spacing: 1px;
         }
 
+        /* === INTERESTS === */
         .interests {
             display: flex;
             flex-wrap: wrap;
@@ -208,119 +449,290 @@
         }
 
         .interest-chip {
-            padding: 10px 20px;
+            padding: 12px 24px;
             background: var(--surface);
             border: 1px solid var(--border);
             border-radius: 100px;
             font-size: 0.85rem;
             color: var(--text-muted);
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.16,1,0.3,1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .interest-chip::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, var(--accent), var(--accent-2));
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .interest-chip span {
+            position: relative;
+            z-index: 1;
         }
 
         .interest-chip:hover {
-            background: var(--accent-soft);
-            border-color: var(--accent);
-            color: var(--accent);
+            border-color: transparent;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(232,115,90,0.2);
         }
 
+        .interest-chip:hover::before {
+            opacity: 1;
+        }
+
+        .interest-chip:hover span {
+            color: white;
+        }
+
+        /* === FOOTER === */
         footer {
             text-align: center;
-            padding: 40px 20px 60px;
+            padding: 60px 20px;
             border-top: 1px solid var(--border);
         }
 
         footer p {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: var(--text-muted);
-            letter-spacing: 2px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
         }
 
-        .fade-in {
+        /* === FLOATING SHAPES === */
+        .shapes {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .shape {
+            position: absolute;
+            border: 1px solid rgba(232,115,90,0.1);
+            border-radius: 50%;
+        }
+
+        /* === REVEAL ANIMATIONS === */
+        .reveal {
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(40px);
+            transition: all 1s cubic-bezier(0.16,1,0.3,1);
         }
 
-        .fade-in.visible {
+        .reveal.visible {
             opacity: 1;
             transform: translateY(0);
         }
 
+        .reveal-delay-1 { transition-delay: 0.1s; }
+        .reveal-delay-2 { transition-delay: 0.2s; }
+        .reveal-delay-3 { transition-delay: 0.3s; }
+        .reveal-delay-4 { transition-delay: 0.4s; }
+
+        /* === MOBILE === */
         @media (max-width: 480px) {
-            .about-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .about-item {
-                padding: 20px;
-            }
-
-            .content {
-                padding: 60px 20px;
-            }
+            .about-grid { grid-template-columns: 1fr; }
+            .about-item { padding: 24px 20px; }
+            .content { padding: 60px 20px; }
+            .cursor, .cursor-dot, .cursor-follower { display: none; }
+            body { cursor: auto; }
         }
     </style>
 </head>
 <body>
 
-<section class="hero">
-    <div class="photo-wrap">
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-dot" id="cursorDot"></div>
+<div class="cursor-follower" id="cursorFollower"></div>
+
+<!-- NOISE -->
+<div class="noise"></div>
+
+<!-- LOADING SCREEN -->
+<div class="loader" id="loader">
+    <div class="loader-text">
+        <span style="animation-delay: 0s">Л</span><span style="animation-delay: 0.08s">и</span><span style="animation-delay: 0.16s">з</span><span style="animation-delay: 0.24s">а</span>
+    </div>
+    <div class="loader-line"></div>
+</div>
+
+<!-- FLOATING SHAPES -->
+<div class="shapes" id="shapes"></div>
+
+<!-- HERO -->
+<section class="hero" id="hero">
+    <div class="hero-bg"></div>
+    <div class="photo-container">
+        <div class="photo-ring"></div>
         <img class="photo" src="liza.jpg" alt="Лиза">
     </div>
-    <h1 class="name">Лиза</h1>
-    <p class="tagline">17 &bull; Кемерово</p>
-    <div class="scroll-indicator"></div>
+    <div class="name-wrapper">
+        <h1 class="name">
+            <span class="name-glitch" data-text="Лиза">Лиза</span>
+        </h1>
+    </div>
+    <p class="tagline" id="tagline"></p>
+    <div class="scroll-indicator">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+    </div>
 </section>
 
+<!-- CONTENT -->
 <div class="content">
-    <div class="fade-in">
-        <p class="section-label">О себе</p>
+    <div class="section-label reveal" id="sectionAbout">
+        <span>О себе</span>
     </div>
 
-    <div class="about-grid fade-in">
-        <div class="about-item">
+    <div class="about-grid">
+        <div class="about-item magnetic reveal reveal-delay-1">
             <div class="label">Возраст</div>
             <div class="value">17 лет</div>
         </div>
-        <div class="about-item">
+        <div class="about-item magnetic reveal reveal-delay-2">
             <div class="label">Город</div>
             <div class="value">Кемерово, Ленинский район</div>
         </div>
-        <div class="about-item">
+        <div class="about-item magnetic reveal reveal-delay-3">
             <div class="label">Хобби</div>
             <div class="value">Делает маникюр сама себе</div>
         </div>
-        <div class="about-item">
+        <div class="about-item magnetic reveal reveal-delay-4">
             <div class="label">Характер</div>
             <div class="value">Наивная и доверчивая</div>
         </div>
     </div>
 
-    <div class="divider fade-in"></div>
+    <div class="divider reveal"></div>
 
-    <div class="quote-block fade-in">
+    <div class="quote-block reveal">
         <p class="quote-text">Рыжая дура, нихуя не делает, без работы и без друзей, слишком наивная и доверчивая, сидит дома и разлагается</p>
         <p class="quote-author">&mdash; Лиза о себе</p>
     </div>
 
-    <div class="divider fade-in"></div>
+    <div class="divider reveal"></div>
 
-    <div class="fade-in">
-        <p class="section-label">Интересы</p>
+    <div class="reveal">
+        <div class="section-label"><span>Интересы</span></div>
         <div class="interests">
-            <span class="interest-chip">Ноготочки</span>
-            <span class="interest-chip">Мемы</span>
-            <span class="interest-chip">Диван</span>
+            <div class="interest-chip magnetic"><span>Ноготочки</span></div>
+            <div class="interest-chip magnetic"><span>Мемы</span></div>
+            <div class="interest-chip magnetic"><span>Диван</span></div>
         </div>
     </div>
 </div>
 
-<footer>
+<footer class="reveal">
     <p>Сделано с любовью для Лизы</p>
 </footer>
 
 <script>
-    const observer = new IntersectionObserver((entries) => {
+// === LOADER ===
+window.addEventListener('load', () => {
+    setTimeout(() => {
+        document.getElementById('loader').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        initAnimations();
+    }, 2000);
+});
+document.body.style.overflow = 'hidden';
+
+// === CUSTOM CURSOR ===
+const cursor = document.getElementById('cursor');
+const cursorDot = document.getElementById('cursorDot');
+const follower = document.getElementById('cursorFollower');
+let mouseX = 0, mouseY = 0;
+let cursorX = 0, cursorY = 0;
+let followerX = 0, followerY = 0;
+
+document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursorDot.style.left = mouseX + 'px';
+    cursorDot.style.top = mouseY + 'px';
+});
+
+function animateCursor() {
+    cursorX += (mouseX - cursorX) * 0.15;
+    cursorY += (mouseY - cursorY) * 0.15;
+    followerX += (mouseX - followerX) * 0.08;
+    followerY += (mouseY - followerY) * 0.08;
+    cursor.style.left = cursorX + 'px';
+    cursor.style.top = cursorY + 'px';
+    follower.style.left = followerX + 'px';
+    follower.style.top = followerY + 'px';
+    requestAnimationFrame(animateCursor);
+}
+animateCursor();
+
+// Hover effect on interactive elements
+document.querySelectorAll('.magnetic, .interest-chip').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+        follower.classList.add('hover');
+        cursor.style.transform = 'translate(-50%, -50%) scale(1.5)';
+    });
+    el.addEventListener('mouseleave', () => {
+        follower.classList.remove('hover');
+        cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+    });
+});
+
+// === MAGNETIC EFFECT ===
+document.querySelectorAll('.magnetic').forEach(el => {
+    el.addEventListener('mousemove', e => {
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        el.style.transform = `translate(${x * 0.3}px, ${y * 0.3}px)`;
+    });
+    el.addEventListener('mouseleave', () => {
+        el.style.transform = 'translate(0, 0)';
+    });
+});
+
+// === ABOUT ITEM SPOTLIGHT ===
+document.querySelectorAll('.about-item').forEach(el => {
+    el.addEventListener('mousemove', e => {
+        const rect = el.getBoundingClientRect();
+        el.style.setProperty('--mx', ((e.clientX - rect.left) / rect.width * 100) + '%');
+        el.style.setProperty('--my', ((e.clientY - rect.top) / rect.height * 100) + '%');
+    });
+});
+
+// === TAGLINE TEXT SCRAMBLE ===
+const taglineEl = document.getElementById('tagline');
+const taglineText = '17 · Кемерово';
+const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZАБВГДЕЖЗИКЛМНОПРСТУФХЦЧШЩЭЮЯ!@#$%';
+let taglineIndex = 0;
+
+function scrambleTagline() {
+    if (taglineIndex <= taglineText.length) {
+        let result = '';
+        for (let i = 0; i < taglineText.length; i++) {
+            if (i < taglineIndex) {
+                result += taglineText[i];
+            } else {
+                result += chars[Math.floor(Math.random() * chars.length)];
+            }
+        }
+        taglineEl.textContent = result;
+        taglineIndex += 0.5;
+        requestAnimationFrame(scrambleTagline);
+    }
+}
+
+// === SCROLL REVEAL ===
+function initAnimations() {
+    scrambleTagline();
+
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('visible');
@@ -328,7 +740,45 @@
         });
     }, { threshold: 0.15 });
 
-    document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    reveals.forEach(el => observer.observe(el));
+}
+
+// === FLOATING SHAPES ===
+const shapesContainer = document.getElementById('shapes');
+for (let i = 0; i < 8; i++) {
+    const shape = document.createElement('div');
+    shape.className = 'shape';
+    const size = Math.random() * 200 + 50;
+    shape.style.width = size + 'px';
+    shape.style.height = size + 'px';
+    shape.style.left = Math.random() * 100 + '%';
+    shape.style.top = Math.random() * 100 + '%';
+    shape.style.opacity = Math.random() * 0.5;
+    shape.style.animation = `floatShape ${20 + Math.random() * 20}s ease-in-out infinite`;
+    shape.style.animationDelay = -Math.random() * 20 + 's';
+    shapesContainer.appendChild(shape);
+}
+
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes floatShape {
+        0%, 100% { transform: translate(0, 0) rotate(0deg); }
+        25% { transform: translate(30px, -40px) rotate(90deg); }
+        50% { transform: translate(-20px, 20px) rotate(180deg); }
+        75% { transform: translate(40px, 30px) rotate(270deg); }
+    }
+`;
+document.head.appendChild(style);
+
+// === PARALLAX ON HERO ===
+document.addEventListener('mousemove', e => {
+    const hero = document.getElementById('hero');
+    if (!hero) return;
+    const x = (e.clientX / window.innerWidth - 0.5) * 20;
+    const y = (e.clientY / window.innerHeight - 0.5) * 20;
+    hero.querySelector('.photo-container').style.transform = `translate(${x}px, ${y}px)`;
+    hero.querySelector('.name-wrapper').style.transform = `translate(${x * 0.5}px, ${y * 0.5}px)`;
+});
 </script>
 
 </body>
